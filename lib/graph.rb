@@ -18,18 +18,12 @@ class Graph
   end
 
   def get_viable_moves(vertex)
-    vertex.viable_moves = DIRECTION.map do |move|
-      [vertex.x + move.first, vertex.y + move.last]
-    end
-    vertex.viable_moves.select! do |array|
-      array.first.between?(0, SIZE - 1) && array.last.between?(0, SIZE - 1)
-    end
+    vertex.viable_moves = DIRECTION.map { |move| [vertex.x + move.first, vertex.y + move.last] }
+    vertex.viable_moves.select! { |array| array.first.between?(0, SIZE - 1) && array.last.between?(0, SIZE - 1) }
   end
 
-  def knight_moves(origin_coordinates, destination_coordinates)
-    origin_vertex = @board[origin_coordinates[0]][origin_coordinates[1]]
-    puts "Origin: #{origin_vertex.coordinates} Target: #{destination_coordinates}"
-    order = level_order(origin_vertex, destination_coordinates)
+  def knight_moves(orig_coord, dest_coord)
+    order = level_order(@board[orig_coord[0]][orig_coord[1]], dest_coord)
     path = rebuild_path(order)
     puts "You made it in #{path.size - 1} moves! Here's your path:"
     path.each { |move| p move }
