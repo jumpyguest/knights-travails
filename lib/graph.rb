@@ -10,7 +10,7 @@ class Graph
 
   def build_graph
     @board.each_with_index do |row, x|
-      row.each_with_index do |vertex, y|
+      row.each_with_index do |_vertex, y|
         @board[x][y] = Vertex.new(x, y)
         get_viable_moves(@board[x][y])
       end
