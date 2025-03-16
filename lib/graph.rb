@@ -1,9 +1,7 @@
 require_relative 'vertex'
 
 class Graph
-  attr_reader :board
-
-  SIZE = 4
+  SIZE = 8
   DIRECTION = [[-2, -1], [-1, -2], [-2, 1], [-1, 2], [2, -1], [1, -2], [2, 1], [1, 2]]
 
   def initialize
@@ -20,19 +18,21 @@ class Graph
   end
 
   def get_viable_moves(vertex)
-    p vertex.coordinates
     vertex.viable_moves = DIRECTION.map do |move|
       [vertex.x + move.first, vertex.y + move.last]
     end
     vertex.viable_moves.select! do |array|
       array.first.between?(0, SIZE - 1) && array.last.between?(0, SIZE - 1)
     end
-    p vertex.viable_moves
   end
 
   def knight_moves(origin_coordinates, destination_coordinates)
     origin_vertex = @board[origin_coordinates[0]][origin_coordinates[1]]
+    puts "Origin: #{origin_vertex.coordinates} Target: #{destination_coordinates}"
     order = level_order(origin_vertex, destination_coordinates)
+    path = rebuild_path(order)
+    puts "You made it in #{path.size - 1} moves! Here's your path:"
+    path.each { |move| p move }
   end
 
   def level_order(origin_vertex, dest_coordinates)
@@ -47,15 +47,19 @@ class Graph
 
       current_vertex.viable_moves.each do |adj_coordinates|
         vertex = @board[adj_coordinates[0]][adj_coordinates[1]]
+        next if vertices_order.include?(vertex) || queue.include?(vertex)
+
         vertex.preceding_pos = current_vertex.coordinates
-        queue.push(vertex) unless vertices_order.include?(vertex)
+        queue.push(vertex)
       end
     end
   end
-end
 
-graph = Graph.new
-graph.build_graph
-p "printing board #{graph.board[2][2].viable_moves})"
-pathway = graph.knight_moves([0, 0], [3, 2])
-pathway.each { |element| p element.coordinates }
+  def rebuild_path(order)
+    path = []
+
+    path << order.pop
+    path.last.preceding_pos == order.last.coordinates ? path << order.pop : order.pop until order.empty?
+    path.reverse!.map(&:coordinates)
+  end
+end
